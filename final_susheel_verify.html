@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>3Pathi Certificate Verification</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:#fff;color:#000;padding:40px 20px}
+.container{max-width:600px;margin:0 auto}
+h1{font-size:32px;font-weight:400;margin-bottom:60px}
+.search-card{background:#f5f5f7;border-radius:12px;padding:40px;margin-bottom:80px}
+.search-input{width:100%;padding:16px 20px;font-size:16px;border:1px solid #d1d1d6;background:white;outline:none}
+.search-btn{width:100%;padding:18px;background:#000;color:#fff;border:none;font-size:16px;font-weight:500;cursor:pointer}
+.loading{text-align:center;padding:40px;color:#86868b;font-size:16px}
+.spinner{border:3px solid #f3f3f3;border-top:3px solid #000;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.error-message{text-align:center;color:#ff3b30;font-size:16px;margin-top:20px;opacity:0;transition:opacity .3s ease}
+.error-message.show{opacity:1}
+.hidden{display:none}
+.results-section{opacity:0;transform:translateY(20px);transition:opacity .4s ease,transform .4s ease}
+.results-section.show{opacity:1;transform:translateY(0)}
+.results-title{font-size:48px;font-weight:400;margin-bottom:40px}
+.results-card{background:#f5f5f7;border-radius:12px;overflow:hidden}
+.result-row{padding:20px 30px;border-bottom:1px solid #d1d1d6;font-size:16px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>3Pathi Certificate VERIFICATION</h1>
+
+<div class="search-card">
+  <input id="codeInput" class="search-input" placeholder="Enter Certificate Code"/>
+  <button id="searchBtn" class="search-btn">Search</button>
+</div>
+
+<div id="loadingState" class="loading hidden">
+  <div class="spinner"></div>
+  <div>Verifying certificate...</div>
+</div>
+
+<div id="errorMessage" class="error-message">Certificate not found. Please check the code.</div>
+
+<div id="resultsSection" class="results-section">
+  <h2 class="results-title">Certificate Result</h2>
+  <div class="results-card">
+    <div class="result-row" id="nameRow">Student Name:</div>
+    <div class="result-row" id="domainRow">Domain:</div>
+    <div class="result-row" id="durationRow">Duration:</div>
+    <div class="result-row" id="certNoRow">Certification No:</div>
+    <div class="result-row" id="startRow">Starting Date:</div>
+    <div class="result-row" id="awardRow">Award Date:</div>
+  </div>
+</div>
+</div>
+
+<script>
+const registry={
+ "sk-92ml25":{
+   name:"Susheel Kumar",
+   domain:"ML Intern",
+   duration:"4 week",
+   certNo:"sk-92ml25",
+   start:"17/Jul/2025",
+   end:"19/Aug/2025"
+ }
+};
+
+const input=document.getElementById("codeInput");
+const searchBtn=document.getElementById("searchBtn");
+const loadingState=document.getElementById("loadingState");
+const errorMessage=document.getElementById("errorMessage");
+const resultsSection=document.getElementById("resultsSection");
+
+function hideAll(){
+  loadingState.classList.add("hidden");
+  errorMessage.classList.remove("show");
+  resultsSection.classList.remove("show");
+}
+function showLoading(){
+  hideAll();
+  loadingState.classList.remove("hidden");
+  searchBtn.disabled=true;
+}
+function showError(){
+  hideAll();
+  errorMessage.classList.add("show");
+  searchBtn.disabled=false;
+}
+function showResults(data){
+  document.getElementById("nameRow").textContent="Student Name: "+data.name;
+  document.getElementById("domainRow").textContent="Domain: "+data.domain;
+  document.getElementById("durationRow").textContent="Duration: "+data.duration;
+  document.getElementById("certNoRow").textContent="Certification No: "+data.certNo;
+  document.getElementById("startRow").textContent="Starting Date: "+data.start;
+  document.getElementById("awardRow").textContent="Award Date: "+data.end;
+
+  hideAll();
+  setTimeout(()=>{resultsSection.classList.add("show");searchBtn.disabled=false;},100);
+}
+function handleSearch(){
+  const code=input.value.trim().toLowerCase();
+  if(!code){
+    errorMessage.textContent="Please enter a certificate code";
+    showError();
+    return;
+  }
+  showLoading();
+  setTimeout(()=>{
+    if(registry[code]) showResults(registry[code]);
+    else{
+      errorMessage.textContent="Certificate not found.";
+      showError();
+    }
+  },1200);
+}
+
+searchBtn.addEventListener("click",handleSearch);
+input.addEventListener("keydown",e=>{if(e.key==="Enter")handleSearch();});
+</script>
+
+</body>
+</html>
